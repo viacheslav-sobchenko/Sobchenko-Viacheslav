@@ -2,151 +2,171 @@
 using namespace std;
 
 class Node{
-    public:
-        int value;
-        Node* next;
+public:
+    int value;
+    Node* next;
 };
 
-Node* creatList(){
-    int count;
-    cout << "Enter the number of items: ";
-    cin >> count;
 
-    Node* head = nullptr;
-    Node* cur = nullptr;
+// ================= CREATE =================
+Node* createList(int i, int n){
+    if(i > n) return nullptr;
 
-    for(int i = 0; i < count; i++){
-        int value;
-        cout << "Item №" << i + 1 << ": ";
-        cin >> value;
+    int v;
+    cout << "Item #" << i << ": ";
+    cin >> v;
 
-        Node* newNode = new Node();
-        newNode -> value = value;
-        newNode -> next = nullptr;
+    Node* node = new Node();
+    node->value = v;
+    node->next = createList(i + 1, n);
 
-        if(!head){
-            head = newNode;
-            cur = newNode;
-        } else{
-            cur -> next = newNode;
-            cur = newNode;
-        }
-    }
-
-    return head;
+    return node;
 }
 
+
+// ================= PRINT =================
 void printList(Node* head){
-    Node* cur = head;
-
-    while(cur){
-        cout << cur -> value << " ";
-        cur = cur -> next;
-    }
-
-    cout << endl;
-}
-
-void addBefore(Node* & head, int target, int newValue){
-    if(!head) return;
-
-    if(head -> value == target){
-        Node* newNode = new Node();
-
-        newNode -> value = newValue;
-        newNode -> next = head;
-        head = newNode;
-
+    if(!head){
+        cout << "\n";
         return;
     }
 
-    Node* prev = head;
-    Node* cur = head -> next;
-
-    while(cur){
-        if(cur -> value == target){
-            Node* newNode = new Node();
-
-            newNode -> value = newValue;
-            newNode -> next = cur;
-            prev -> next = newNode;
-
-            return;
-        }
-
-        prev = cur;
-        cur = cur -> next;
-    }
-
-    cout << "Item not found :(" << endl;
+    cout << head->value << " ";
+    printList(head->next);
 }
 
-void addAfter(Node* & head, int target, int newValue){
-    Node* cur = head;
 
-    while(cur){
-        if(cur -> value == target){
-            Node* newNode = new Node();
+// ================= INSERT BEFORE =================
+bool insertBefore(Node*& nodeRef, int target, int newValue){
+    if(!nodeRef) return false;
 
-            newNode -> value = newValue;
-            newNode -> next = cur -> next;
-            cur -> next = newNode;
+    if(nodeRef->value == target){
+        Node* n = new Node();
+        n->value = newValue;
+        n->next = nodeRef;
+        nodeRef = n;
 
-            return;
-        }
-
-        cur = cur -> next;
+        return true;
     }
 
-    cout << "Item not found :(" << endl;
+    return insertBefore(nodeRef->next, target, newValue);
 }
 
+
+// ================= INSERT AFTER =================
+bool insertAfter(Node* node, int target, int newValue){
+    if(!node) return false;
+
+    if(node->value == target){
+        Node* n = new Node();
+        n->value = newValue;
+        n->next = node->next;
+        node->next = n;
+
+        return true;
+    }
+
+    return insertAfter(node->next, target, newValue);
+}
+
+
+// ================= DELETE BEFORE =================
+bool deleteBefore(Node*& nodeRef, int target){
+    if(!nodeRef || !nodeRef->next) return false;
+
+    if(nodeRef->next->value == target){
+        Node* toDel = nodeRef;
+        nodeRef = nodeRef->next;
+        delete toDel;
+
+        return true;
+    }
+
+    return deleteBefore(nodeRef->next, target);
+}
+
+
+// ================= MAIN =================
 int main(){
-    Node* head = creatList();
+    int n;
+    cout << "Enter number of items: ";
+    cin >> n;
+
+    Node* head = createList(1, n);
 
     cout << "Your list: ";
     printList(head);
 
-    int choice, target, newValue;
+    int choice, target, value;
 
     while(true){
         cout << "\nMenu:\n"
-             << "1 - add itme before target\n"
-             << "2 - add item after target\n"
-             << "0 - end Code ^-^\n"
+             << "1 - print your list\n"
+             << "2 - insert BEFORE target\n"
+             << "3 - insert AFTER  target\n"
+             << "4 - delete element BEFORE target\n"
+             << "0 - exit\n"
              << "Your choice: ";
-        if(!(cin >> choice)) break;
+
+        if(!(cin >> choice)) return 0;
 
         switch(choice){
-            case 1:
-                cout << "Add before which element? ";
-                cin >> target;
-                cout << "Value to add: ";
-                cin >> newValue;
-                addBefore(head, target, newValue);
+        case 1:
+            cout << "Your List: ";
+            printList(head);
+
+            break;
+
+        case 2:
+            cout << "Insert BEFORE which element? ";
+            cin >> target;
+            cout << "Value to insert: ";
+            cin >> value;
+
+            if(!insertBefore(head, target, value))
+                cout << "Element not found\n";
+
+            cout << "Updated list: ";
+            printList(head);
+
+            break;
+
+        case 3:
+            cout << "Insert AFTER which element? ";
+            cin >> target;
+            cout << "Value to insert: ";
+            cin >> value;
+
+            if(!insertAfter(head, target, value))
+                cout << "Element not found\n";
+
+            cout << "Updated list: ";
+            printList(head);
+
+            break;
+
+        case 4:
+            cout << "Delete element BEFORE which target? ";
+            cin >> target;
+
+            if(head && head->value == target)
+                cout << "Nothing to delete (target is head).\n";
+            else if(deleteBefore(head, target))
                 cout << "Updated list: ";
-                printList(head);
-                break;
+            else
+                cout << "Nothing to delete (target not found).\n";
 
-            case 2:
-                cout << "Add after which element? ";
-                cin >> target;
-                cout << "Value to add: ";
-                cin >> newValue;
-                addAfter(head, target, newValue);
-                cout << "Updated list: ";
-                printList(head);
-                break;
+            printList(head);
 
-             case 0:
-                cout << "Exiting program." << endl;
-                break;
+            break;
 
-            default:
-                cout << "Invalid choice, try again! >-<" << endl;
+        case 0:
+            cout << "Exiting program.\n";
+
+            return 0;
+
+        default:
+            cout << "Invalid choice. Try again.\n";
         }
     }
-
-    return 0;
 }
-
