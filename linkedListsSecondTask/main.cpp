@@ -1,6 +1,8 @@
 #include <iostream>
 using namespace std;
 
+//написаний код гарний, немає жодних питань - 80/100
+
 class Node{
 public:
     int value;
