@@ -1,6 +1,8 @@
 #include <iostream>
 using namespace std;
 
+//гарно написана робота, питань немає - 100/100
+
 class Node{
     public:
         int value;
@@ -14,7 +16,7 @@ Node* creatList(){
 
     Node* head = nullptr;
     Node* cur = nullptr;
-
+//гарно використаний цикл, також можна було і без нього
     for(int i = 0; i < count; i++){
         int value;
         cout << "Item №" << i + 1 << ": ";
