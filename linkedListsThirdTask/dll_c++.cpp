@@ -53,13 +53,13 @@ void printListStartWithHead(Node* head) {
     }
 }
 
-//TO DO: write deleteNode(...)
+//TODO: write deleteNode(...)
 
-//TO DO: write insertBefore(...)
+//TODO: write insertBefore(...)
 
-//TO DO: write insertAfter(...)
+//TODO: write insertAfter(...)
 // 
-//TO DO: write isSymmetric(Node* head)
+//TODO: write isSymmetric(Node* head)
 
 int main()
 {
