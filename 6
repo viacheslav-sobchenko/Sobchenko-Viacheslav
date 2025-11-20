@@ -1,0 +1,126 @@
+class ProductCatalog {
+private:
+    AVLTree priceTree;
+    Product products[100];
+    int productCount;
+
+    int findProductIndexByPrice(int price) {
+        for (int i = 0; i < productCount; i++) {
+            if (products[i].price == price) return i;
+        }
+        return -1;
+    }
+
+public:
+    ProductCatalog() : productCount(0) {}
+
+    void addProduct(string name, int price) {
+        if (productCount >= 100) { cout << "Catalog is full!" << endl; return; }
+        Product p(name, price);
+        products[productCount++] = p;
+        priceTree.insert(price);
+        cout << "Added: "; p.print(); cout << endl;
+    }
+
+    void findProductByPrice(int price) {
+        if (priceTree.search(price)) {
+            int index = findProductIndexByPrice(price);
+            if (index != -1) {
+                cout << "Found product with price " << price << ": ";
+                products[index].print();
+                cout << endl;
+            }
+        } else {
+            cout << "No product with price " << price << " UAH" << endl;
+        }
+    }
+
+    void findClosestByPrice(int price) {
+        if (priceTree.isEmpty()) { cout << "Catalog is empty" << endl; return; }
+        int closestPrice = priceTree.findClosest(price);
+        if (closestPrice != -1) {
+            int index = findProductIndexByPrice(closestPrice);
+            if (index != -1) {
+                cout << "Closest to " << price << ": " ;
+                products[index].print();
+                cout << endl;
+            }
+        }
+    }
+
+    void printAllInOrder() {
+        if (priceTree.isEmpty()) { cout << "Catalog is empty" << endl; return; }
+        for (int i = 0; i < productCount - 1; i++) {
+            for (int j = 0; j < productCount - i - 1; j++) {
+                if (products[j].price > products[j + 1].price) {
+                    Product tmp = products[j];
+                    products[j] = products[j + 1];
+                    products[j + 1] = tmp;
+                }
+            }
+        }
+        cout << "Products by ascending price:" << endl;
+        for (int i = 0; i < productCount; i++) {
+            cout << "  ";
+            products[i].print();
+            cout << endl;
+        }
+    }
+};
+
+int main() {
+
+
+    AVLTree AVLTree;
+    int nums[10] = {48, 24, 72, 12, 30, 60, 84, 6, 18, 27};
+    for (int i = 0; i < 10; i++) AVLTree.insert(nums[i]);
+
+    cout << "After inserts: ";
+    AVLTree.printInOrder();
+
+    int q1 = 27;
+    cout << "Search " << q1 << ": " << (AVLTree.search(q1) ? "found" : "not found") << endl;
+
+    int q2 = 96;
+    cout << "Search " << q2 << ": " << (AVLTree.search(q2) ? "found" : "not found") << endl;
+
+    AVLTree.deleteKey(24);
+    cout << "After delete 24: ";
+    AVLTree.printInOrder();
+
+    AVLTree.deleteKey(48);
+    cout << "After delete 48: ";
+    AVLTree.printInOrder();
+
+    AVLTree.insert(36);
+    cout << "After insert 36: ";
+    AVLTree.printInOrder();
+
+    cout << "\n PRODUCT CATALOG" << endl;
+
+    ProductCatalog catalog;
+
+    cout << "\nAdding products " << endl;
+    catalog.addProduct("Gaming Laptop", 31999);
+    catalog.addProduct("Wireless Mouse", 450);
+    catalog.addProduct("Mechanical Keyboard", 1990);
+    catalog.addProduct("Curved Monitor 27", 10490);
+    catalog.addProduct("BT Headset", 1890);
+    catalog.addProduct("4K Webcam", 2990);
+    catalog.addProduct("Desk Mat", 350);
+    ;
+
+    cout << "\nList all" << endl;
+    catalog.printAllInOrder();
+
+    cout << "\nExact price search" << endl;
+    catalog.findProductByPrice(1190);
+    catalog.findProductByPrice(31999);
+
+    cout << "\nNearest by price" << endl;
+    catalog.findClosestByPrice(1000);
+    catalog.findClosestByPrice(350);
+
+
+    return 0;
+}
