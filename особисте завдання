@@ -1,0 +1,163 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Homework {
+private:
+    string subject;
+    string task;
+    int priority;
+
+public:
+    Homework() : subject(""), task(""), priority(0) {}
+
+    Homework(const string& s, const string& t, int p)
+        : subject(s), task(t), priority(p) {}
+
+    string getSubject() const {
+        return subject;
+    }
+
+    string getTask() const {
+        return task;
+    }
+
+    int getPriority() const {
+        return priority;
+    }
+
+    void setPriority(int p) {
+        priority = p;
+    }
+
+    void print() const {
+        cout << "[" << priority << "] " << subject << ": " << task << '\n';
+    }
+};
+
+class PriorityQueue {
+private:
+    Homework* data;
+    int size;
+    int capacity;
+
+    void heapifyUp(int index) {
+        while (index > 0) {
+            int parent = (index - 1) / 2;
+            if (data[parent].getPriority() < data[index].getPriority()) {
+                swap(data[parent], data[index]);
+                index = parent;
+            } else {
+                break;
+            }
+        }
+    }
+
+    void heapifyDown(int index) {
+        while (true) {
+            int left = index * 2 + 1;
+            int right = index * 2 + 2;
+            int largest = index;
+
+            if (left < size &&
+                data[left].getPriority() > data[largest].getPriority()) {
+                largest = left;
+            }
+
+            if (right < size &&
+                data[right].getPriority() > data[largest].getPriority()) {
+                largest = right;
+            }
+
+            if (largest == index) {
+                break;
+            }
+
+            swap(data[index], data[largest]);
+            index = largest;
+        }
+    }
+
+public:
+    PriorityQueue(int cap = 100) {
+        capacity = cap;
+        size = 0;
+        data = new Homework[capacity];
+    }
+
+    ~PriorityQueue() {
+        delete[] data;
+    }
+
+    bool isEmpty() const {
+        return size == 0;
+    }
+
+    void push(const string& subject, const string& task, int priority) {
+        if (size == capacity) {
+            return;
+        }
+        data[size] = Homework(subject, task, priority);
+        heapifyUp(size);
+        size++;
+    }
+
+    Homework pop() {
+        if (size == 0) {
+            return Homework();
+        }
+        Homework top = data[0];
+        data[0] = data[size - 1];
+        size--;
+        if (size > 0) {
+            heapifyDown(0);
+        }
+        return top;
+    }
+
+    void setPriority(const string& subject, const string& task, int newPriority) {
+        for (int i = 0; i < size; i++) {
+            if (data[i].getSubject() == subject && data[i].getTask() == task) {
+                int oldPriority = data[i].getPriority();
+                data[i].setPriority(newPriority);
+                if (newPriority > oldPriority) {
+                    heapifyUp(i);
+                } else if (newPriority < oldPriority) {
+                    heapifyDown(i);
+                }
+                return;
+            }
+        }
+    }
+
+    void printAll() const {
+        cout << "Homework queue:\n";
+        for (int i = 0; i < size; i++) {
+            data[i].print();
+        }
+    }
+};
+
+int main() {
+    PriorityQueue q;
+
+    q.push("Math", "Solve integrals", 5);
+    q.push("Physics", "Lab report", 3);
+    q.push("History", "Essay about WW2", 7);
+    q.push("Programming", "Finish AVL tree", 9);
+
+    q.printAll();
+    cout << "\nChange priority:\n";
+
+    q.setPriority("Physics", "Lab report", 10);
+    q.printAll();
+
+    cout << "\nPop highest priority:\n";
+    Homework h = q.pop();
+    h.print();
+
+    cout << "\nQueue now:\n";
+    q.printAll();
+
+    return 0;
+}
