@@ -1,0 +1,156 @@
+#include <iostream>
+using namespace std;
+
+class Node {
+public:
+    int value;
+    Node* left= nullptr;
+    Node* right = nullptr;
+
+    Node(int value) {
+        this->value = value;
+    }
+
+};
+
+
+Node* createTree() {
+    int value;
+    cout << "Enter value to be inserted: ";
+    cin >> value;
+    //it nothing is entered we leave this node empty and return
+    if (!value) {
+        return nullptr;
+    }
+
+    Node* root = new Node(value);
+    root->left = createTree();
+    root->right = createTree();
+
+    return root;
+}
+
+void preorderTraversal(Node* root) {
+    if (root == nullptr) {
+        return;
+    }
+    cout << root->value << " ";
+    preorderTraversal(root->left);
+    preorderTraversal(root->right);
+}
+
+void inorderTraversal(Node* root) {
+    if (root == nullptr) {
+        return;
+    }
+    inorderTraversal(root->left);
+    cout << root->value << " ";
+    inorderTraversal(root->right);
+}
+
+void postorderTraversal(Node* root) {
+    if (root == nullptr) {
+        return;
+    }
+    postorderTraversal(root->left);
+    postorderTraversal(root->right);
+    cout << root->value << " ";
+}
+
+bool s(Node* a, Node* b) {
+
+    if (a == nullptr && b == nullptr) {
+        return true;
+    }
+
+
+    if (a == nullptr || b == nullptr) {
+        return false;
+    }
+
+
+    return s(a->left, b->right) && s(a->right, b->left);
+}
+
+bool isTreeSymmetric(Node* root) {
+    if (root == nullptr) {
+
+        return true;
+    }
+    return s(root->left, root->right);
+}
+
+int findMaxElement(Node* root) {
+    if (root == nullptr) {
+        return 0;
+    }
+    int leftMax = findMaxElement(root->left);
+    int rightMax = findMaxElement(root->right);
+
+    int MaxElement = root->value;
+    if (leftMax > MaxElement) MaxElement = leftMax;
+    if (rightMax > MaxElement) MaxElement = rightMax;
+
+    return MaxElement;
+}
+
+int treeHeight(Node* root) {
+    if (root == nullptr) {
+        return 0;
+    }
+
+    int leftHeight = treeHeight(root->left);
+    int rightHeight = treeHeight(root->right);
+
+    int MaxHeight;
+    if (leftHeight > rightHeight) {
+        MaxHeight = leftHeight;
+    } else {
+        MaxHeight = rightHeight;
+    }
+
+    return MaxHeight + 1;
+}
+
+
+
+
+int main()
+{
+    Node* root = createTree();
+
+    cout << "Tree in preorder traversal: " ;
+    preorderTraversal(root);
+    cout << endl;
+    cout << endl;
+
+    cout << "Tree in inorder traversal: ";
+    preorderTraversal(root);
+    cout << endl;
+    cout << endl;
+
+    cout << "Tree in postorder traversal: ";
+    preorderTraversal(root);
+    cout << endl;
+    cout << endl;
+
+    if (isTreeSymmetric(root)) {
+        cout << "Tree is Symmetric" << endl;
+        cout << endl;
+    } else {
+        cout << "Tree is not Symmetric" << endl;
+        cout << endl;
+    }
+
+    int height = findMaxElement(root);
+    cout << "Tree height is: " << height << endl;
+    cout << endl;
+
+
+
+    int max = findMaxElement(root);
+    cout <<"Max element is: " << max << endl;
+    cout << endl;
+
+
+}
