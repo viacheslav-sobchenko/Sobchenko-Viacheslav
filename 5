@@ -1,0 +1,142 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+struct Student {
+    std::string name;
+    float grade;
+};
+
+struct Node {
+    Student data;
+    Node* left  = nullptr;
+    Node* right = nullptr;
+
+    explicit Node(const Student& s) : data(s) {}
+};
+
+Node* create_node(const Student& s) {
+    return new Node(s);
+}
+
+Node* insert(Node* root, const Student& s) {
+    if (!root) return new Node(s);
+
+    if (s.grade < root->data.grade) {
+        root->left = insert(root->left, s);
+    } else if (s.grade > root->data.grade) {
+        root->right = insert(root->right, s);
+    } else {
+        if (s.name < root->data.name) {
+            root->left = insert(root->left, s);
+        } else {
+            root->right = insert(root->right, s);
+        }
+    }
+    return root;
+}
+
+void inorder(const Node* root) {
+    if (!root) return;
+    inorder(root->left);
+    std::cout << root->data.name << " - " << root->data.grade << '\n';
+    inorder(root->right);
+}
+
+Node* search(Node* root, float grade) {
+    if (!root) return nullptr;
+    if (grade == root->data.grade) return root;
+    return (grade < root->data.grade)
+        ? search(root->left, grade)
+        : search(root->right, grade);
+}
+
+Node* min_node(Node* root) {
+    while (root && root->left) root = root->left;
+    return root;
+}
+
+Node* erase(Node* root, float grade) {
+    if (!root) return nullptr;
+
+    if (grade < root->data.grade) {
+        root->left = erase(root->left, grade);
+    } else if (grade > root->data.grade) {
+        root->right = erase(root->right, grade);
+    } else {
+        if (!root->left && !root->right) {
+            delete root;
+            return nullptr;
+        }
+        if (!root->left) {
+            Node* t = root->right;
+            delete root;
+            return t;
+        }
+        if (!root->right) {
+            Node* t = root->left;
+            delete root;
+            return t;
+        }
+        Node* t = min_node(root->right);
+        root->data = t->data;
+        root->right = erase(root->right, t->data.grade);
+    }
+    return root;
+}
+
+void print_less_than(const Node* root, float value) {
+    if (!root) return;
+    if (root->data.grade >= value) {
+        print_less_than(root->left, value);
+        return;
+    }
+    print_less_than(root->left, value);
+    std::cout << root->data.name << " - " << root->data.grade << '\n';
+    print_less_than(root->right, value);
+}
+
+void destroy(Node* root) {
+    if (!root) return;
+    destroy(root->left);
+    destroy(root->right);
+    delete root;
+}
+
+int main() {
+    Node* root = nullptr;
+
+    std::vector<Student> students{
+        {"Maksym", 85},
+        {"Kiril", 50},
+        {"Oleg", 65},
+        {"Ivan", 98},
+        {"Denis", 78},
+        {"Alex", 78},
+        {"Bohdan", 85}
+    };
+
+    for (const auto& s : students) root = insert(root, s);
+
+    std::cout << "Inorder:\n";
+    inorder(root);
+
+    std::cout << "\nSearch by grade 85:\n";
+    if (Node* found = search(root, 85.0f)) {
+        std::cout << found->data.name << " - " << found->data.grade << '\n';
+    } else {
+        std::cout << "Not found\n";
+    }
+
+    std::cout << "\nErase grade 98\n";
+    root = erase(root, 98.0f);
+
+    std::cout << "After erase:\n";
+    inorder(root);
+
+    std::cout << "\nStudents with grade below 78:\n";
+    print_less_than(root, 78.0f);
+
+    destroy(root);
+    return 0;
+}
